@@ -137,7 +137,9 @@ function _parse(data: SyncBufferReader, type?: number|null): XJData {
 		const result = Object.create(null);
 		let size = data.getNextInt32();
 		while (size --> 0) Object.defineProperty(result, _parse(data, 0x05) as string, {
-			value: _parse(data)
+			value: _parse(data),
+			enumerable: true,
+			writable: true,
 		})
 		return result;
 	}
