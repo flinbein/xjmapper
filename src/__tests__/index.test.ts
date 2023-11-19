@@ -4,6 +4,10 @@ test("parse-serialize null", () => {
 	expect(parse(serialize(null))[0]).toBeNull();
 });
 
+test("parse-serialize undefined", () => {
+	expect(parse(serialize(undefined))[0]).toBeUndefined();
+});
+
 describe('parse-serialize boolean', function () {
 	test("false", () => expect(parse(serialize(false))[0]).toBe(false));
 	test("true", () => expect(parse(serialize(true))[0]).toBe(true));
@@ -158,12 +162,13 @@ describe('object', function () {
 	});
 	
 	test("deep", () => {
-		const source = {x: null, y: -123n, z: [3, null, {m: {x:4}, s:{x:5}}]} as const;
+		const source = {x: null, y: -123n, z: [3, null, {m: {x:4}, s:{x:5, u: undefined}}]} as const;
 		const result = parse(serialize(source))[0] as typeof source;
 		expect(typeof result).toBe("object");
 		expect(Object.getOwnPropertyNames(result).length).toBe(3);
 		expect(result.z[2].m.x).toBe(4);
 		expect(result.z[2].s.x).toBe(5);
+		expect(result.z[2].s.u).toBeUndefined();
 	});
 })
 

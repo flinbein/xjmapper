@@ -6,7 +6,7 @@ type TypedArray =
 	| Float32Array  /*0e*/ | Float64Array  /*0f*/ | BigInt64Array  /*10*/ | BigUint64Array  /*11*/
 ;
 export type XJPrimitive =
-	| null /*00*/ | boolean /*01,02*/ | number /*03 or 0xf_*/ | bigint /*04*/ | string /*05*/
+	| undefined /*15*/  | null /*00*/ | boolean /*01,02*/ | number /*03 or 0xf_*/ | bigint /*04*/ | string /*05*/
 	| ArrayBuffer /*06*/
 	| TypedArray /*07-11*/
 export type XJArray = readonly XJData[]  /*12*/
@@ -38,6 +38,7 @@ function _serialize(val: XJData, pool?: Set<any>): (number|TypedArray)[] {
 	if (pool?.has(val)) throw new Error("wrong xj format: recursive");
 	
 	if (val === null) return [0x00];
+	if (val === undefined) return [0x15];
 	if (typeof val === "boolean") return [val ? 0x02 : 0x01];
 	if (typeof val === "number") {
 		if (Number.isInteger(val) && val >= 0 && val <= 0x0f) return [0xf0 + val]; // small integers
@@ -160,6 +161,7 @@ function _parse(data: SyncBufferReader, type?: number|null): XJData {
 		result.stack = stack;
 		return result;
 	}
+	if (type === 0x15) return undefined;
 	if (type >= 0xf0 && type <= 0xff) return type - 0xf0; // small integers
 	throw new Error("wrong binary state-data format");
 }
