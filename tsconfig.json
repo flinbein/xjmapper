@@ -2,10 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
         "experimentalDecorators": true,
-		"target": "ESNext",
-		"lib": ["ESNext"],
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"target": "es5",
+		"module": "ES2015",
 		"outDir": "./dist",
 		"strict": true,
 		"strictNullChecks": true,
