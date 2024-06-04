@@ -13,4 +13,3 @@ export declare class SyncBufferReader {
     readUintSizeAndArrayBuf(multiplier?: number): ArrayBuffer;
     hasBytes(): boolean;
 }
-//# sourceMappingURL=SyncBufferReader.d.ts.map

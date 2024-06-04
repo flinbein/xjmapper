@@ -8,4 +8,3 @@ export type XJData = Error | XJPrimitive | XJArray | XJRecord;
 export declare function serialize(...val: XJData[]): Uint8Array;
 export declare function parse(data: Uint8Array, maxCount?: number): readonly XJData[];
 export {};
-//# sourceMappingURL=index.d.ts.map
