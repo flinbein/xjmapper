@@ -1,5 +1,4 @@
 import { SyncBufferReader } from "./SyncBufferReader.js";
-import {CausedError} from "./CausedError";
 
 type TypedArray =
 	| Int8Array /*07*/ | Int16Array /*08*/ | Int32Array /*09*/
@@ -80,7 +79,7 @@ function _serialize(val: XJData, pool?: Set<any>): (number|TypedArray)[] {
 		const [/*ignored_type*/, ...dataMessage] = _serialize(String(val.message));
 		const [/*ignored_type*/, ...dataStack] = _serialize(String(val.stack));
 		let causeData: ReturnType<typeof _serialize> = [0x00];
-		if (val instanceof CausedError && val.cause !== undefined) try {
+		if (val.cause !== undefined) try {
 			const causeSerialized = _serialize(val.cause as any);
 			causeData = [0x01, ...causeSerialized];
 		} catch {}
@@ -156,7 +155,7 @@ function _parse(data: SyncBufferReader, type?: number|null): XJData {
 			result = new Error(message);
 		} else {
 			const cause = _parse(data);
-			result = new CausedError(message, {cause});
+			result = new Error(message, {cause});
 		}
 		result.name = name;
 		result.stack = stack;

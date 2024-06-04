@@ -1,10 +1,10 @@
 {
   "name": "xjmapper",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
-  "typings": "./src/index.ts",
+  "typings": "./dist/index.d.ts",
   "author": "dpohvar@gmail.com",
   "scripts": {
     "build": "tsc",

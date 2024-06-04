@@ -1,32 +1,17 @@
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 import { SyncBufferReader } from "./SyncBufferReader.js";
-import { CausedError } from "./CausedError";
-var encoder = new TextEncoder();
-var decoder = new TextDecoder();
-export function serialize() {
-    var val = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        val[_i] = arguments[_i];
-    }
-    var dataList = val.flatMap(function (data) { return _serialize(data); });
-    var totalSize = dataList.reduce(function (acc, e) { return acc + (typeof e === "number" ? 1 : e.byteLength); }, 0);
-    var merged = new Uint8Array(totalSize);
-    var offset = 0;
-    for (var _a = 0, dataList_1 = dataList; _a < dataList_1.length; _a++) {
-        var data = dataList_1[_a];
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+export function serialize(...val) {
+    const dataList = val.flatMap(data => _serialize(data));
+    const totalSize = dataList.reduce((acc, e) => acc + (typeof e === "number" ? 1 : e.byteLength), 0);
+    const merged = new Uint8Array(totalSize);
+    let offset = 0;
+    for (let data of dataList) {
         if (typeof data === "number") {
             merged[offset++] = data;
         }
         else {
-            var view = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+            const view = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
             merged.set(view, offset);
             offset += data.byteLength;
         }
@@ -34,7 +19,7 @@ export function serialize() {
     return merged;
 }
 function _serialize(val, pool) {
-    if (pool === null || pool === void 0 ? void 0 : pool.has(val))
+    if (pool?.has(val))
         throw new Error("wrong xj format: recursive");
     if (val === null)
         return [0x00];
@@ -48,12 +33,12 @@ function _serialize(val, pool) {
         return [0x03, Float64Array.of(val)];
     }
     if (typeof val === "bigint") {
-        var _a = _serialize(val.toString(10)), ignored_type = _a[0], dataBin = _a.slice(1);
-        return __spreadArray([0x04], dataBin, true);
+        const [ignored_type, ...dataBin] = _serialize(val.toString(10));
+        return [0x04, ...dataBin];
     }
     if (typeof val === "string") {
         encoder.encode(val);
-        var stringBuffer = encoder.encode(val);
+        const stringBuffer = encoder.encode(val);
         return [
             0x05,
             Uint32Array.of(stringBuffer.byteLength),
@@ -85,42 +70,47 @@ function _serialize(val, pool) {
     if (val instanceof BigUint64Array)
         return [0x11, Uint32Array.of(val.length), val];
     if (Array.isArray(val))
-        return __spreadArray([
+        return [
             0x12,
-            Uint32Array.of(val.length)
-        ], val.flatMap(function (item) { return _serialize(item, new Set(pool).add(val)); }), true);
+            Uint32Array.of(val.length),
+            ...val.flatMap(item => _serialize(item, new Set(pool).add(val)))
+        ];
     if (val instanceof Error) {
-        var _b = _serialize(String(val.name)), dataName = _b.slice(1);
-        var _c = _serialize(String(val.message)), dataMessage = _c.slice(1);
-        var _d = _serialize(String(val.stack)), dataStack = _d.slice(1);
-        var causeData = [0x00];
-        if (val instanceof CausedError && val.cause !== undefined)
+        const [/*ignored_type*/ , ...dataName] = _serialize(String(val.name));
+        const [/*ignored_type*/ , ...dataMessage] = _serialize(String(val.message));
+        const [/*ignored_type*/ , ...dataStack] = _serialize(String(val.stack));
+        let causeData = [0x00];
+        if (val.cause !== undefined)
             try {
-                var causeSerialized = _serialize(val.cause);
-                causeData = __spreadArray([0x01], causeSerialized, true);
+                const causeSerialized = _serialize(val.cause);
+                causeData = [0x01, ...causeSerialized];
             }
-            catch (_e) { }
-        return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
-            0x14
-        ], dataName, true), dataMessage, true), dataStack, true), causeData, true);
+            catch { }
+        return [
+            0x14,
+            ...dataName,
+            ...dataMessage,
+            ...dataStack,
+            ...causeData
+        ];
     }
     if (typeof val === "object") {
-        var names = Object.getOwnPropertyNames(val).sort();
-        var closedVal_1 = val;
-        return __spreadArray([
+        const names = Object.getOwnPropertyNames(val).sort();
+        const closedVal = val;
+        return [
             0x13,
-            Uint32Array.of(names.length)
-        ], names.flatMap(function (key) {
-            var _a = _serialize(key), ignored_type = _a[0], dataBin = _a.slice(1);
-            return __spreadArray(__spreadArray([], dataBin, true), _serialize(closedVal_1[key], new Set(pool).add(val)), true);
-        }), true);
+            Uint32Array.of(names.length),
+            ...names.flatMap((key) => {
+                const [ignored_type, ...dataBin] = _serialize(key);
+                return [...dataBin, ..._serialize(closedVal[key], new Set(pool).add(val))];
+            })
+        ];
     }
     throw new Error("wrong xj format: wrong type");
 }
-export function parse(data, maxCount) {
-    if (maxCount === void 0) { maxCount = Infinity; }
-    var result = [];
-    var reader = new SyncBufferReader(data);
+export function parse(data, maxCount = Infinity) {
+    const result = [];
+    const reader = new SyncBufferReader(data);
     while (maxCount-- > 0 && reader.hasBytes())
         result.push(_parse(reader));
     return result;
@@ -165,10 +155,10 @@ function _parse(data, type) {
     if (type === 0x11 /*BigUint64Array*/)
         return new BigUint64Array(data.readUintSizeAndArrayBuf(8));
     if (type === 0x12 /*Array*/)
-        return Array.from({ length: data.getNextInt32() }).map(function () { return _parse(data); });
+        return Array.from({ length: data.getNextInt32() }).map(() => _parse(data));
     if (type === 0x13 /*Object*/) {
-        var result = Object.create(null);
-        var size = data.getNextInt32();
+        const result = Object.create(null);
+        let size = data.getNextInt32();
         while (size-- > 0)
             Object.defineProperty(result, _parse(data, 0x05), {
                 value: _parse(data),
@@ -178,19 +168,19 @@ function _parse(data, type) {
         return result;
     }
     if (type === 0x14 /*Error*/) {
-        var name_1 = decoder.decode(data.getNextUintSizeAndUint8Array());
-        var message = decoder.decode(data.getNextUintSizeAndUint8Array());
-        var stack = decoder.decode(data.getNextUintSizeAndUint8Array());
-        var hasCause = data.getNextUint8();
-        var result = void 0;
+        const name = decoder.decode(data.getNextUintSizeAndUint8Array());
+        const message = decoder.decode(data.getNextUintSizeAndUint8Array());
+        const stack = decoder.decode(data.getNextUintSizeAndUint8Array());
+        const hasCause = data.getNextUint8();
+        let result;
         if (!hasCause) {
             result = new Error(message);
         }
         else {
-            var cause = _parse(data);
-            result = new CausedError(message, { cause: cause });
+            const cause = _parse(data);
+            result = new Error(message, { cause });
         }
-        result.name = name_1;
+        result.name = name;
         result.stack = stack;
         return result;
     }

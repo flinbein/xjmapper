@@ -2,9 +2,10 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
         "experimentalDecorators": true,
-		"target": "es5",
-		"module": "ES2015",
+		"target": "ES2022",
 		"outDir": "./dist",
+		"declaration": true,
+		"declarationMap": true,
 		"strict": true,
 		"strictNullChecks": true,
 		"skipLibCheck": true,
@@ -22,6 +23,7 @@
 	"exclude": [
 		"./node_modules/**/*",
 		"**/*/__test__/**/*",
-		"**/*/__tests__/**/*"
+		"**/*/__tests__/**/*",
+		"./dist/**/*"
 	]
 }
