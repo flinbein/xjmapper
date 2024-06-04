@@ -1,6 +1,6 @@
 {
   "name": "xjmapper",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "module": "./dist/esm/index.js",
   "main": "./dist/cjs/index.js",
   "typings": "./dist/types/index.d.ts",
@@ -22,10 +22,10 @@
   },
   "exports": {
     ".": {
-      "types": "./build/types/index.d.ts",
-      "require": "./build/cjs/index.d.js",
-      "import": "./build/esm/index.d.js",
-      "default": "./build/esm/index.d.js"
+      "types": "./dists/types/index.d.ts",
+      "require": "./dists/cjs/index.d.js",
+      "import": "./dists/esm/index.d.js",
+      "default": "./dists/esm/index.d.js"
     }
   }
 }
