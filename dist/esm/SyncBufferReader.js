@@ -1,15 +1,14 @@
 export class SyncBufferReader {
-    byteData;
     index = 0;
     dataView;
-    constructor(byteData) {
-        this.byteData = byteData;
-        this.dataView = byteData instanceof ArrayBuffer
-            ? new DataView(byteData)
-            : new DataView(byteData.buffer, byteData.byteOffset, byteData.byteLength);
+    constructor(data) {
+        this.dataView =
+            data instanceof DataView ? data :
+                data instanceof ArrayBuffer ? new DataView(data) :
+                    new DataView(data.buffer, data.byteOffset, data.byteLength);
     }
     assertSize(bytesSize) {
-        if (this.byteData.byteLength < this.index + bytesSize) {
+        if (this.dataView.byteLength < this.index + bytesSize) {
             throw new Error("wrong binary state-data format");
         }
     }
@@ -47,7 +46,7 @@ export class SyncBufferReader {
         return buffer.slice(byteOffset, byteOffset + byteLength);
     }
     hasBytes() {
-        return this.index < this.byteData.byteLength;
+        return this.index < this.dataView.byteLength;
     }
 }
 //# sourceMappingURL=SyncBufferReader.js.map

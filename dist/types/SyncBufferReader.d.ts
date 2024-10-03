@@ -1,9 +1,8 @@
 import type { TypedArray } from "./index";
 export declare class SyncBufferReader {
-    private byteData;
     private index;
     private dataView;
-    constructor(byteData: TypedArray | ArrayBuffer);
+    constructor(data: TypedArray | ArrayBuffer | DataView);
     private assertSize;
     getNextUint8(): number;
     getNextInt32(): number;

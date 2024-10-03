@@ -264,3 +264,31 @@ describe('multi-value', function () {
 		expect(parse(dataPart, 3)).toEqual([a, b, c]);
 	});
 })
+
+describe('test source types', function () {
+	test("Uint8array", () => {
+		const data = serialize("foo", "bar", "long-string-ignored-in-parse");
+		expect(parse(data, 2)[1]).toBe("bar")
+	});
+	
+	test("buffer", () => {
+		const data = serialize("foo", "bar", "long-string-ignored-in-parse");
+		const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + 15)
+		expect(parse(data.buffer, 2)[1]).toBe("bar")
+	});
+	
+	test("Uint32Array", () => {
+		const data = serialize("foo", "bar", "long-string-ignored-in-parse");
+		new Uint32Array(data.buffer, 0, 3);
+		expect(parse(data.buffer, 2)[1]).toBe("bar")
+	});
+	
+	
+	test("DataView", () => {
+		const fooData = serialize("foo");
+		const data = serialize("foo", "bar", "long-string-ignored-in-parse");
+		const dataView = new DataView(data.buffer, data.byteOffset + fooData.byteLength /* skip foo */, 15);
+		expect(parse(dataView, 1)[0]).toBe("bar")
+	});
+});
+

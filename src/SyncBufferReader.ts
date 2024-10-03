@@ -3,14 +3,16 @@ import type { TypedArray } from "./index";
 export class SyncBufferReader {
 	private index = 0;
 	private dataView: DataView;
-	constructor(private byteData: TypedArray | ArrayBuffer) {
-		this.dataView = byteData instanceof ArrayBuffer
-			? new DataView(byteData)
-			: new DataView(byteData.buffer, byteData.byteOffset, byteData.byteLength);
+	constructor(data: TypedArray | ArrayBuffer | DataView) {
+		this.dataView =
+			data instanceof DataView ? data :
+			data instanceof ArrayBuffer ? new DataView(data) :
+			new DataView(data.buffer, data.byteOffset, data.byteLength)
+		;
 	}
 	
 	private assertSize(bytesSize: number): void {
-		if (this.byteData.byteLength < this.index + bytesSize) {
+		if (this.dataView.byteLength < this.index + bytesSize) {
 			throw new Error("wrong binary state-data format");
 		}
 	}
@@ -59,7 +61,7 @@ export class SyncBufferReader {
 	}
 	
 	hasBytes(): boolean {
-		return this.index < this.byteData.byteLength;
+		return this.index < this.dataView.byteLength;
 	}
 	
 }

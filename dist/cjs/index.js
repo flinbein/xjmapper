@@ -113,6 +113,8 @@ function _serialize(val, pool) {
     throw new Error("wrong xj format: wrong type");
 }
 function parse(data, maxCount = Infinity) {
+    if (typeof data === "string")
+        data = encoder.encode(data);
     const result = [];
     const reader = new SyncBufferReader_js_1.SyncBufferReader(data);
     while (maxCount-- > 0 && reader.hasBytes())
