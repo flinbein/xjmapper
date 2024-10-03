@@ -1,12 +1,16 @@
+import type { TypedArray } from "./index";
+
 export class SyncBufferReader {
 	private index = 0;
 	private dataView: DataView;
-	constructor(private byteData: Uint8Array) {
-		this.dataView = new DataView(byteData.buffer, byteData.byteOffset, byteData.byteLength);
+	constructor(private byteData: TypedArray | ArrayBuffer) {
+		this.dataView = byteData instanceof ArrayBuffer
+			? new DataView(byteData)
+			: new DataView(byteData.buffer, byteData.byteOffset, byteData.byteLength);
 	}
 	
 	private assertSize(bytesSize: number): void {
-		if (this.byteData.length < this.index + bytesSize) {
+		if (this.byteData.byteLength < this.index + bytesSize) {
 			throw new Error("wrong binary state-data format");
 		}
 	}
@@ -34,7 +38,11 @@ export class SyncBufferReader {
 	
 	getNextUint8Array(size: number): Uint8Array {
 		this.assertSize(size);
-		const result = this.byteData.subarray(this.index, this.index + size);
+		const buffer = this.dataView.buffer.slice(
+			this.dataView.byteOffset + this.index,
+			this.dataView.byteOffset + this.index + size
+		);
+		const result = new Uint8Array(buffer);
 		this.index += size;
 		return result;
 	}
@@ -51,7 +59,7 @@ export class SyncBufferReader {
 	}
 	
 	hasBytes(): boolean {
-		return this.index < this.byteData.length;
+		return this.index < this.byteData.byteLength;
 	}
 	
 }

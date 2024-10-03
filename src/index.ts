@@ -1,6 +1,6 @@
 import { SyncBufferReader } from "./SyncBufferReader.js";
 
-type TypedArray =
+export type TypedArray =
 	| Int8Array /*07*/ | Int16Array /*08*/ | Int32Array /*09*/
 	| Uint8Array  /*0a*/ | Uint16Array  /*0b*/ | Uint32Array  /*0c*/ | Uint8ClampedArray  /*0d*/
 	| Float32Array  /*0e*/ | Float64Array  /*0f*/ | BigInt64Array  /*10*/ | BigUint64Array  /*11*/
@@ -106,7 +106,7 @@ function _serialize(val: XJData, pool?: Set<any>): (number|TypedArray)[] {
 	throw new Error("wrong xj format: wrong type");
 }
 
-export function parse(data: Uint8Array, maxCount = Infinity): readonly XJData[] {
+export function parse(data: TypedArray | ArrayBuffer, maxCount = Infinity): readonly XJData[] {
 	const result: XJData[] = []
 	const reader = new SyncBufferReader(data);
 	while (maxCount --> 0 && reader.hasBytes()) result.push(_parse(reader));
