@@ -106,7 +106,7 @@ function _serialize(val: XJData, pool?: Set<any>): (number|TypedArray)[] {
 	throw new Error("wrong xj format: wrong type");
 }
 
-export function parse(data: TypedArray | ArrayBuffer, maxCount = Infinity): readonly XJData[] {
+export function parse(data: ArrayBuffer | TypedArray, maxCount = Infinity): readonly XJData[] {
 	const result: XJData[] = []
 	const reader = new SyncBufferReader(data);
 	while (maxCount --> 0 && reader.hasBytes()) result.push(_parse(reader));

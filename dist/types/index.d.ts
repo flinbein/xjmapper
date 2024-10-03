@@ -6,4 +6,4 @@ export type XJRecord = {
 };
 export type XJData = Error | XJPrimitive | XJArray | XJRecord;
 export declare function serialize(...val: XJData[]): Uint8Array;
-export declare function parse(data: TypedArray | ArrayBuffer, maxCount?: number): readonly XJData[];
+export declare function parse(data: ArrayBuffer | TypedArray, maxCount?: number): readonly XJData[];
