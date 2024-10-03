@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ES2023",
 		"outDir": "./build",
 		"experimentalDecorators": true,
 		"strict": true,
@@ -13,7 +13,8 @@
 		"allowUnreachableCode": false,
 		"allowUnusedLabels": false,
 		"strictBindCallApply": true,
-		"strictFunctionTypes": true
+		"strictFunctionTypes": true,
+		"sourceMap": true
 	},
 	"buildOptions": {
 		"verbose": true

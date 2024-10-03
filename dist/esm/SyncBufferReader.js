@@ -4,10 +4,12 @@ export class SyncBufferReader {
     dataView;
     constructor(byteData) {
         this.byteData = byteData;
-        this.dataView = new DataView(byteData.buffer, byteData.byteOffset, byteData.byteLength);
+        this.dataView = byteData instanceof ArrayBuffer
+            ? new DataView(byteData)
+            : new DataView(byteData.buffer, byteData.byteOffset, byteData.byteLength);
     }
     assertSize(bytesSize) {
-        if (this.byteData.length < this.index + bytesSize) {
+        if (this.byteData.byteLength < this.index + bytesSize) {
             throw new Error("wrong binary state-data format");
         }
     }
@@ -30,7 +32,8 @@ export class SyncBufferReader {
     }
     getNextUint8Array(size) {
         this.assertSize(size);
-        const result = this.byteData.subarray(this.index, this.index + size);
+        const buffer = this.dataView.buffer.slice(this.dataView.byteOffset + this.index, this.dataView.byteOffset + this.index + size);
+        const result = new Uint8Array(buffer);
         this.index += size;
         return result;
     }
@@ -44,6 +47,7 @@ export class SyncBufferReader {
         return buffer.slice(byteOffset, byteOffset + byteLength);
     }
     hasBytes() {
-        return this.index < this.byteData.length;
+        return this.index < this.byteData.byteLength;
     }
 }
+//# sourceMappingURL=SyncBufferReader.js.map

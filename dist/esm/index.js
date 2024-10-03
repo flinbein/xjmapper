@@ -190,3 +190,4 @@ function _parse(data, type) {
         return type - 0xf0; // small integers
     throw new Error("wrong binary state-data format");
 }
+//# sourceMappingURL=index.js.map

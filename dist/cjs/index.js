@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parse = exports.serialize = void 0;
+exports.serialize = serialize;
+exports.parse = parse;
 const SyncBufferReader_js_1 = require("./SyncBufferReader.js");
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -21,7 +22,6 @@ function serialize(...val) {
     }
     return merged;
 }
-exports.serialize = serialize;
 function _serialize(val, pool) {
     if (pool?.has(val))
         throw new Error("wrong xj format: recursive");
@@ -119,7 +119,6 @@ function parse(data, maxCount = Infinity) {
         result.push(_parse(reader));
     return result;
 }
-exports.parse = parse;
 function _parse(data, type) {
     if (type == null)
         type = data.getNextUint8();
@@ -195,3 +194,4 @@ function _parse(data, type) {
         return type - 0xf0; // small integers
     throw new Error("wrong binary state-data format");
 }
+//# sourceMappingURL=index.js.map
