@@ -5,11 +5,11 @@ export declare class SyncBufferReader {
     constructor(data: TypedArray | ArrayBuffer | DataView);
     private assertSize;
     getNextUint8(): number;
-    getNextInt32(): number;
+    getNextUint16(): number;
+    getNextUint32(): number;
     getNextFloat64(): number;
-    skipBytes(count?: number): void;
+    skipBytes(count: number): void;
     getNextUint8Array(size: number): Uint8Array;
-    getNextUintSizeAndUint8Array(multiplier?: number): Uint8Array;
-    readUintSizeAndArrayBuf(multiplier?: number): ArrayBuffer;
+    getArrayBuffer(size: number): ArrayBuffer;
     hasBytes(): boolean;
 }

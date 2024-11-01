@@ -21,8 +21,14 @@ export class SyncBufferReader {
 		return this.dataView.getUint8(this.index++);
 	}
 	
-	getNextInt32(): number {
-		const result = this.dataView.getInt32(this.index, true);
+	getNextUint16(): number {
+		const result = this.dataView.getUint16(this.index, true);
+		this.index += 2;
+		return result;
+	}
+	
+	getNextUint32(): number {
+		const result = this.dataView.getUint32(this.index, true);
 		this.index += 4;
 		return result;
 	}
@@ -33,31 +39,23 @@ export class SyncBufferReader {
 		return result;
 	}
 	
-	skipBytes(count = 1): void{
+	skipBytes(count: number): void{
 		this.assertSize(count);
 		this.index += count;
 	}
 	
 	getNextUint8Array(size: number): Uint8Array {
+		return new Uint8Array(this.getArrayBuffer(size));
+	}
+	
+	getArrayBuffer(size: number): ArrayBuffer {
 		this.assertSize(size);
 		const buffer = this.dataView.buffer.slice(
 			this.dataView.byteOffset + this.index,
 			this.dataView.byteOffset + this.index + size
 		);
-		const result = new Uint8Array(buffer);
 		this.index += size;
-		return result;
-	}
-	
-	getNextUintSizeAndUint8Array(multiplier = 1): Uint8Array {
-		const size = this.getNextInt32();
-		const byteLength = size * multiplier;
-		return this.getNextUint8Array(byteLength);
-	}
-	
-	readUintSizeAndArrayBuf(multiplier = 1): ArrayBuffer {
-		const {buffer, byteLength, byteOffset} = this.getNextUintSizeAndUint8Array(multiplier);
-		return buffer.slice(byteOffset, byteOffset + byteLength)
+		return buffer;
 	}
 	
 	hasBytes(): boolean {

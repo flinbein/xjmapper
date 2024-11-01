@@ -16,11 +16,27 @@ describe('parse-serialize boolean', function () {
 describe('parse-serialize number', function () {
 	
 	test("0", () => expect(parse(serialize(0))[0]).toBe(0));
+	test("-0", () => expect(parse(serialize(0))[0]).toBe(0));
+	test("0 is positive", () => {
+		const result = parse(serialize(0))[0] as number;
+		expect(1 / result > 0).toBeTruthy()
+	});
+	test("-0 is negative", () => {
+		const result = parse(serialize(-0))[0] as number;
+		expect(1 / result < 0).toBeTruthy()
+	});
 	test("0x01", () => expect(parse(serialize(0x01))[0]).toBe(0x01));
+	test("-0x01", () => expect(parse(serialize(-0x01))[0]).toBe(-0x01));
 	test("0x0f", () => expect(parse(serialize(0x0f))[0]).toBe(0x0f));
+	test("-0x0f", () => expect(parse(serialize(-0x0f))[0]).toBe(-0x0f));
 	test("0x10", () => expect(parse(serialize(0x10))[0]).toBe(0x10));
-	test("-1", () => expect(parse(serialize(-1))[0]).toBe(-1));
+	test("-0x10", () => expect(parse(serialize(-0x10))[0]).toBe(-0x10));
+	test("0xff20", () => expect(parse(serialize(0xff20))[0]).toBe(0xff20));
+	test("-0xff20", () => expect(parse(serialize(-0xff20))[0]).toBe(-0xff20));
+	test("999999999999", () => expect(parse(serialize(999999999999))[0]).toBe(999999999999));
+	test("-999999999999", () => expect(parse(serialize(-999999999999))[0]).toBe(-999999999999));
 	test("Pi", () => expect(parse(serialize(Math.PI))[0]).toBe(Math.PI));
+	test("-Pi", () => expect(parse(serialize(-Math.PI))[0]).toBe(-Math.PI));
 	test("max", () => expect(parse(serialize(Number.MAX_VALUE))[0]).toBe(Number.MAX_VALUE));
 	test("min", () => expect(parse(serialize(Number.MIN_VALUE))[0]).toBe(Number.MIN_VALUE));
 	test("max safe", () => expect(parse(serialize(Number.MAX_SAFE_INTEGER))[0]).toBe(Number.MAX_SAFE_INTEGER));
@@ -33,11 +49,21 @@ describe('parse-serialize number', function () {
 
 describe('parse-serialize bigint', function () {
 	test("0n", () => expect(parse(serialize(0n))[0]).toBe(0n));
+	test("1n", () => expect(parse(serialize(1n))[0]).toBe(1n));
+	test("-1n", () => expect(parse(serialize(-1n))[0]).toBe(-1n));
+	test("255n", () => expect(parse(serialize(255n))[0]).toBe(255n));
+	test("-255n", () => expect(parse(serialize(-255n))[0]).toBe(-255n));
+	test("256n", () => expect(parse(serialize(256n))[0]).toBe(256n));
+	test("-256n", () => expect(parse(serialize(-256n))[0]).toBe(-256n));
 	test("medium", () => expect(parse(serialize(1234567890n))[0]).toBe(1234567890n));
 	test("negative", () => expect(parse(serialize(-1234567890n))[0]).toBe(-1234567890n));
 	test("rly big", () => {
-		const value = 12345678901234567890123456789012345678901234567890123456789012345678901234567890n;
+		const value = 1234567890123456723453245233245890123456789012345678901234567890123456789012345678901234567890n;
 		expect(parse(serialize(value))[0]).toBe(value);
+	});
+	test("rly big neg", () => {
+		const value = 1234567890123456723453245233245890123456789012345678901234567890123456789012345678901234567890n;
+		expect(parse(serialize(-value))[0]).toBe(-value);
 	});
 });
 
@@ -54,6 +80,11 @@ describe('parse-serialize string', function () {
 	
 	test("long", () => {
 		const value = "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства!"
+		expect(parse(serialize(value))[0]).toBe(value);
+	});
+	
+	test("rly long (80mb string)", () => {
+		const value = "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства!".repeat(500000)
 		expect(parse(serialize(value))[0]).toBe(value);
 	});
 	
@@ -248,8 +279,9 @@ describe('multi-value', function () {
 		const a = 0x0f as const;
 		const b = 0x00 as const;
 		const c = null;
-		const buf = serialize(a, b, c);
-		expect(buf.length).toBe(3);
+		const d = "";
+		const buf = serialize(a, b, c, d);
+		expect(buf.length).toBe(4);
 	});
 	
 	test("read subarray", () => {
@@ -273,16 +305,14 @@ describe('test source types', function () {
 	
 	test("buffer", () => {
 		const data = serialize("foo", "bar", "long-string-ignored-in-parse");
-		const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + 15)
 		expect(parse(data.buffer, 2)[1]).toBe("bar")
 	});
 	
 	test("Uint32Array", () => {
 		const data = serialize("foo", "bar", "long-string-ignored-in-parse");
-		new Uint32Array(data.buffer, 0, 3);
-		expect(parse(data.buffer, 2)[1]).toBe("bar")
+		const array = new Uint32Array(data.buffer, 0, 3);
+		expect(parse(array, 2)[1]).toBe("bar")
 	});
-	
 	
 	test("DataView", () => {
 		const fooData = serialize("foo");
@@ -291,4 +321,3 @@ describe('test source types', function () {
 		expect(parse(dataView, 1)[0]).toBe("bar")
 	});
 });
-
