@@ -1,6 +1,6 @@
 {
   "name": "xjmapper",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "module": "./dist/esm/index.js",
   "main": "./dist/cjs/index.js",
   "typings": "./dist/types/index.d.ts",
@@ -22,6 +22,7 @@
     "typescript": "^5.6.2"
   },
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "types": "./dist/types/index.d.ts",
       "require": "./dist/cjs/index.js",
