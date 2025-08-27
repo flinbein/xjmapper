@@ -1,6 +1,6 @@
 {
   "name": "@flinbein/xjmapper",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "keywords": [
     "serialization"
   ],
@@ -32,7 +32,13 @@
     "ts-jest": "^29.2.5",
     "typescript": "^5.9.2"
   },
-  "files": ["index.js", "index.mjs", "index.d.ts", "index.js.map", "index.mjs.map"],
+  "files": [
+    "index.js",
+    "index.mjs",
+    "index.d.ts",
+    "index.js.map",
+    "index.mjs.map"
+  ],
   "exports": {
     "./package.json": "./package.json",
     ".": {
