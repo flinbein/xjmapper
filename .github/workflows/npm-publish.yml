@@ -1,0 +1,76 @@
+name: npm-publish
+
+on:
+  push:
+    branches: main
+  workflow_dispatch:
+    inputs:
+      VERSION_TYPE:
+        description: 'Version type to bump (patch, minor, major)'
+        required: true
+        options: ['patch', 'minor', 'major']
+        default: 'patch'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Get version type
+        id: get-version-type
+        run: |
+          if [[ -n "$INPUT_VERSION_TYPE" ]]; then
+            echo "VERSION_TYPE=$INPUT_VERSION_TYPE" >> "$GITHUB_OUTPUT"
+            echo "version type from input: $INPUT_VERSION_TYPE"
+          elif [[ "$COMMIT_MESSAGE" =~ \#major($| |\n) ]]; then
+            echo "VERSION_TYPE=major" >> "$GITHUB_OUTPUT"
+            echo "version type from commit message: major"
+          elif [[ "$COMMIT_MESSAGE" =~ \#minor($| |\n) ]]; then
+            echo "VERSION_TYPE=minor" >> "$GITHUB_OUTPUT"
+            echo "version type from commit message: minor"
+          elif [[ "$COMMIT_MESSAGE" =~ \#patch($| |\n) ]]; then
+            echo "VERSION_TYPE=patch" >> "$GITHUB_OUTPUT"
+            echo "version type from commit message: patch"
+          else
+            echo "no version type detected"
+            exit 1;
+          fi
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          $INPUT_VERSION_TYPE: ${{ inputs.VERSION_TYPE }}
+
+      - name: Update version and push
+        run: |
+          git config --global user.email "dpohvar@gmail.com"
+          git config --global user.name "GITHUB_ACTIONS"
+          npm version $VERSION_TYPE
+          git push origin main --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_TYPE: ${{ steps.get-version-type.outputs.VERSION_TYPE }}
+
+      - name: Install (npm)
+        run: npm clean-install
+
+      - name: Build (npm)
+        run: npm run build
+
+      - name: Publish (npm)
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_FLINBEIN }}
+
+

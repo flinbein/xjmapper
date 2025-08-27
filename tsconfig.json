@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"target": "ES2023",
+		"target": "ESNext",
 		"outDir": "./build",
 		"experimentalDecorators": true,
 		"strict": true,
@@ -15,9 +15,6 @@
 		"strictBindCallApply": true,
 		"strictFunctionTypes": true,
 		"sourceMap": true
-	},
-	"buildOptions": {
-		"verbose": true
 	},
 	"exclude": [
 		"./node_modules/**/*",

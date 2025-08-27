@@ -67,7 +67,6 @@ describe('parse-serialize bigint', function () {
 	});
 });
 
-
 describe('parse-serialize string', function () {
 	test("empty", () => {
 		expect(parse(serialize(""))[0]).toBe("");

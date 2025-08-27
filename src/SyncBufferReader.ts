@@ -3,10 +3,11 @@ import type { TypedArray } from "./index";
 export class SyncBufferReader {
 	private index = 0;
 	private dataView: DataView;
-	constructor(data: TypedArray | ArrayBuffer | DataView) {
+	constructor(data: TypedArray | ArrayBuffer | SharedArrayBuffer | DataView) {
 		this.dataView =
 			data instanceof DataView ? data :
 			data instanceof ArrayBuffer ? new DataView(data) :
+			data instanceof SharedArrayBuffer ? new DataView(data) :
 			new DataView(data.buffer, data.byteOffset, data.byteLength)
 		;
 	}
@@ -55,7 +56,7 @@ export class SyncBufferReader {
 			this.dataView.byteOffset + this.index + size
 		);
 		this.index += size;
-		return buffer;
+		return buffer as ArrayBuffer;
 	}
 	
 	hasBytes(): boolean {

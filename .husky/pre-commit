@@ -1,3 +1,0 @@
-rm -r dist || true
-npm run build
-git add dist

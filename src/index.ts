@@ -59,7 +59,7 @@ export type XJData = Error /*14*/ | XJPrimitive | XJArray | XJRecord;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-export function serialize(...val: XJData[]): Uint8Array {
+export function serialize(...val: XJData[]): Uint8Array<ArrayBuffer> {
 	const dataList = val.flatMap(data => _serialize(data));
 	const totalSize = dataList.reduce((acc: number, e) => acc + (typeof e === "number" ? 1 : e.byteLength), 0);
 	const merged = new Uint8Array(totalSize);

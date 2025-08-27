@@ -1,8 +1,19 @@
 {
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
-		"outDir": "./dist/types",
+		"outDir": ".",
+		"declarationDir": ".",
 		"declaration": true,
 		"emitDeclarationOnly": true
-	}
+	},
+	"include": [
+		"./src/index.ts"
+	],
+	"exclude": [
+		"./node_modules/**/*",
+		"**/*/__test__/**/*",
+		"**/*/__tests__/**/*",
+		"./dist/**/*",
+		"./src/SyncBufferReader.ts"
+	]
 }
